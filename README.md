@@ -8,7 +8,7 @@ A simple web-based HTML editor with live preview and tag formatting tools. This 
 
 ![View changed file at right panel](https://dl.dropbox.com/scl/fi/b7r5v0cyj7sy3pfgrxrkz/edit_II.png?rlkey=iiecz5s0a7zn7yo87m0grv2dg&st=dp8l53ys)
 
-![Main menu](https://www.dropbox.com/scl/fi/svsr5qr5eji5xvyldgrv6/edit_III.png?rlkey=sogxkz7cbntc99cri4whsjk3i&st=njpsir75)
+![Main menu](https://dl.dropbox.com/scl/fi/svsr5qr5eji5xvyldgrv6/edit_III.png?rlkey=sogxkz7cbntc99cri4whsjk3i&st=njpsir75)
 
 ## Features
 
