@@ -7,11 +7,8 @@ import socketserver
 import webbrowser
 import threading
 import json
-from urllib.parse import parse_qs, urlparse
-import time
 import mimetypes
-import tempfile
-import shutil
+import time
 
 class SimpleHTMLEditor:
     def __init__(self, html_file=None):
@@ -22,410 +19,194 @@ class SimpleHTMLEditor:
         self.editor_port = 8080
         self.preview_port = 8081
         self.preview_content = ""
-        self.base_dir = os.getcwd()  # Current working directory for static files
+        self.base_dir = os.getcwd()
+        self.ui_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ui')
+        
+        # Check if UI directory exists
+        if not os.path.exists(self.ui_dir):
+            print(f"Error: UI directory not found: {self.ui_dir}")
+            print("Please create the ui/ directory with the required files:")
+            print("  ui/edit_html_ui.html")
+            print("  ui/edit_html_ui.css")
+            print("  ui/edit_html_ui.js")
+            print("  ui/mainmenu.js")
+            print("  ui/actionhandlers.js")
+            print("  ui/default_html_edited_file.html (optional)")
+            sys.exit(1)
         
         # Load content if file exists
         if html_file and os.path.exists(html_file):
             with open(html_file, 'r', encoding='utf-8') as f:
                 self.content = f.read()
                 self.preview_content = self.content
-                # Update base directory to the HTML file's directory
                 self.base_dir = os.path.dirname(os.path.abspath(html_file))
         else:
             self.content = self.get_default_html()
             self.preview_content = self.content
     
     def get_default_html(self):
-        """Get default HTML template"""
+        """Get default HTML template from file or fallback"""
+        default_html_file = os.path.join(self.ui_dir, 'default_html_edited_file.html')
+        
+        if os.path.exists(default_html_file):
+            try:
+                with open(default_html_file, 'r', encoding='utf-8') as f:
+                    return f.read()
+            except Exception as e:
+                print(f"Warning: Could not read default HTML file: {e}")
+                print("Using built-in default HTML...")
+                return self.get_builtin_default_html()
+        else:
+            print("Info: No default_html_edited_file.html found, using built-in default HTML")
+            return self.get_builtin_default_html()
+    
+    def get_builtin_default_html(self):
+        """Fallback built-in default HTML template"""
         return """<!DOCTYPE html>
 <html>
 <head>
     <title>HTML Editor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="HTML Editor">
+    <meta name="description" content="A simple HTML editor with live preview">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
             font-family: Arial, sans-serif;
-            background: #f0f0f0;
-            height: 100vh;
-            overflow: hidden;
+            margin: 20px;
+            line-height: 1.6;
         }
-        
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 15px;
-        }
-        
-        .header h1 {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-        
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        button {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        
-        .file-btn {
-            background: #3498db;
-            color: white;
-        }
-        
-        .file-btn:hover {
-            background: #2980b9;
-        }
-        
-        .tag-btn {
-            background: #27ae60;
-            color: white;
-        }
-        
-        .tag-btn:hover {
-            background: #229954;
-        }
-        
-        .clear-btn {
-            background: #e74c3c;
-            color: white;
-        }
-        
-        .clear-btn:hover {
-            background: #c0392b;
-        }
-        
-        .main-content {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-        
-        .split-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            padding: 10px;
-        }
-        
-        .panel-label {
-            font-weight: bold;
-            margin-bottom: 10px;
+        h1 {
             color: #2c3e50;
-            font-size: 16px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
         }
-        
-        .editor-container, .preview-container {
-            flex: 1;
-            border: 1px solid #bdc3c7;
-            border-radius: 4px;
-            overflow: hidden;
-            background: white;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
-        
-        #html-editor {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .demo-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        .editor-info {
+            background: #e8f4f8;
+            border: 1px solid #b3e0f2;
             padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            resize: none;
-            outline: none;
+            border-radius: 5px;
+            margin: 15px 0;
         }
-        
-        #preview-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .splitter {
-            width: 10px;
-            background: #95a5a6;
-            cursor: col-resize;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .splitter:hover {
-            background: #7f8c8d;
-        }
-        
-        .status-bar {
-            background: #34495e;
-            color: white;
-            padding: 8px 15px;
-            font-size: 13px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        #file-info {
-            font-weight: bold;
-        }
-        
-        #status {
-            font-style: italic;
-        }
-        
-        .file-input {
-            display: none;
+        code {
+            background: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>HTML Editor</h1>
-            <div class="toolbar">
-                <button class="file-btn" onclick="saveFile()">Save</button>
-                <button class="file-btn" onclick="document.getElementById('file-input').click()">Open</button>
-                <button class="clear-btn" onclick="clearEditor()">Clear</button>
-                
-                <input type="file" id="file-input" class="file-input" accept=".html,.htm" onchange="loadLocalFile(this.files[0])">
-                
-                <div style="flex-grow: 1;"></div>
-                
-                <button class="tag-btn" onclick="wrapSelection('b')">Bold (B)</button>
-                <button class="tag-btn" onclick="wrapSelection('i')">Italic (I)</button>
-                <button class="tag-btn" onclick="wrapSelection('u')">Underline (U)</button>
-                <button class="tag-btn" onclick="wrapSelection('p')">Paragraph (P)</button>
-                <button class="tag-btn" onclick="wrapSelection('div')">Div</button>
-                <button class="tag-btn" onclick="wrapSelection('span')">Span</button>
-            </div>
+        <h1>Welcome to HTML Editor</h1>
+        
+        <div class="editor-info">
+            <p><strong>Note:</strong> This is the built-in default HTML. Create a file named 
+            <code>default_html_edited_file.html</code> in the <code>ui/</code> directory 
+            to use your own custom default template.</p>
         </div>
         
-        <div class="main-content">
-            <div class="split-panel">
-                <div class="panel-label">HTML Source</div>
-                <div class="editor-container">
-                    <textarea id="html-editor" oninput="updatePreview()"></textarea>
-                </div>
-            </div>
+        <div class="demo-section">
+            <h2>Getting Started</h2>
+            <p>This is a live preview of your HTML. Edit the code in the left panel to see changes here.</p>
             
-            <div class="splitter" id="splitter">‖</div>
-            
-            <div class="split-panel">
-                <div class="panel-label">Live Preview</div>
-                <div class="preview-container">
-                    <iframe id="preview-frame"></iframe>
-                </div>
-            </div>
+            <h3>Features:</h3>
+            <ul>
+                <li>HTML syntax editing</li>
+                <li>Live preview</li>
+                <li>Tag formatting tools</li>
+                <li>Find and replace</li>
+                <li>Insert common HTML elements</li>
+                <li>Undo/Redo functionality</li>
+                <li>On-screen keyboard</li>
+            </ul>
         </div>
         
-        <div class="status-bar">
-            <div id="file-info">No file loaded</div>
-            <div>Status: <span id="status">Ready</span></div>
+        <div class="demo-section">
+            <h2>Sample HTML Elements</h2>
+            
+            <h3>Text Formatting:</h3>
+            <p><b>Bold text</b>, <i>italic text</i>, and <u>underlined text</u>.</p>
+            
+            <h3>Links:</h3>
+            <p>Visit <a href="#">this example link</a> for more information.</p>
+            
+            <h3>Lists:</h3>
+            <ul>
+                <li>Unordered list item 1</li>
+                <li>Unordered list item 2</li>
+                <li>Unordered list item 3</li>
+            </ul>
+            
+            <ol>
+                <li>Ordered list item 1</li>
+                <li>Ordered list item 2</li>
+                <li>Ordered list item 3</li>
+            </ol>
+            
+            <h3>Code Example:</h3>
+            <pre><code>&lt;!-- This is an HTML comment --&gt;
+&lt;div class="example"&gt;
+    &lt;p&gt;Example paragraph&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+        </div>
+        
+        <div class="demo-section">
+            <h2>Quick Tips:</h2>
+            <ol>
+                <li>Use the menu bar to insert HTML elements</li>
+                <li>Select text and click toolbar buttons to wrap with tags</li>
+                <li>Use Ctrl+S to save your work</li>
+                <li>Drag the splitter between panels to resize</li>
+                <li>Use Find/Replace from the Edit menu to search text</li>
+            </ol>
         </div>
     </div>
     
     <script>
-        let previewPort = 8081;
-        
-        // Initialize splitter
-        let isDragging = false;
-        const splitter = document.getElementById('splitter');
-        const leftPanel = splitter.previousElementSibling;
-        const rightPanel = splitter.nextElementSibling;
-        
-        splitter.addEventListener('mousedown', function(e) {
-            isDragging = true;
-            document.body.style.cursor = 'col-resize';
-            e.preventDefault();
-        });
-        
-        document.addEventListener('mousemove', function(e) {
-            if (!isDragging) return;
-            
-            const containerWidth = document.querySelector('.main-content').offsetWidth;
-            const splitterWidth = splitter.offsetWidth;
-            const mouseX = e.clientX;
-            const containerRect = document.querySelector('.main-content').getBoundingClientRect();
-            const relativeX = mouseX - containerRect.left;
-            
-            // Calculate new widths (minimum 20%)
-            const leftWidth = Math.max(20, Math.min(80, (relativeX / containerWidth) * 100));
-            
-            leftPanel.style.flex = `0 0 ${leftWidth}%`;
-            rightPanel.style.flex = `0 0 ${100 - leftWidth - (splitterWidth / containerWidth * 100)}%`;
-        });
-        
-        document.addEventListener('mouseup', function() {
-            isDragging = false;
-            document.body.style.cursor = '';
-        });
-        
-        // Load initial content
-        window.onload = function() {
-            fetch('/get-content')
-                .then(response => response.json())
-                .then(data => {
-                    const editor = document.getElementById('html-editor');
-                    editor.value = data.content;
-                    
-                    if (data.filename) {
-                        document.getElementById('file-info').textContent = 'File: ' + data.filename;
-                    } else {
-                        document.getElementById('file-info').textContent = 'New file';
-                    }
-                    
-                    // Get preview port from server
-                    if (data.preview_port) {
-                        previewPort = data.preview_port;
-                    }
-                    
-                    // Load initial preview
-                    refreshPreview();
-                    updateStatus('Loaded successfully');
-                })
-                .catch(error => {
-                    console.error('Error loading content:', error);
-                    updateStatus('Error loading content');
-                });
-        };
-        
-        function wrapSelection(tag) {
-            const editor = document.getElementById('html-editor');
-            const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            
-            if (start !== end) {
-                // Text is selected
-                const selectedText = editor.value.substring(start, end);
-                const wrappedText = '<' + tag + '>' + selectedText + '</' + tag + '>';
-                
-                // Replace selection
-                editor.value = editor.value.substring(0, start) + 
-                               wrappedText + 
-                               editor.value.substring(end);
-                
-                // Restore cursor position
-                editor.selectionStart = start;
-                editor.selectionEnd = start + wrappedText.length;
-                
-                updateStatus('Wrapped with ' + tag + ' tags');
-            } else {
-                // No selection, insert at cursor
-                const cursorPos = editor.selectionStart;
-                const textToInsert = '<' + tag + '>text</' + tag + '>';
-                
-                editor.value = editor.value.substring(0, cursorPos) + 
-                               textToInsert + 
-                               editor.value.substring(cursorPos);
-                
-                // Move cursor inside the tags
-                editor.selectionStart = cursorPos + tag.length + 2;
-                editor.selectionEnd = editor.selectionStart + 4;
-                
-                updateStatus('Inserted ' + tag + ' tags');
-            }
-            
-            updatePreview();
-            editor.focus();
-        }
-        
-        function updatePreview() {
-            const content = document.getElementById('html-editor').value;
-            
-            // Send content to preview server
-            fetch('/update-preview', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({content: content})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    refreshPreview();
-                    updateStatus('Preview updated');
-                }
-            })
-            .catch(error => {
-                console.error('Error updating preview:', error);
-            });
-        }
-        
-        function refreshPreview() {
-            // Refresh iframe to show updated content
-            const iframe = document.getElementById('preview-frame');
-            iframe.src = 'http://localhost:' + previewPort + '/?t=' + Date.now();
-        }
-        
-        function saveFile() {
-            const content = document.getElementById('html-editor').value;
-            
-            fetch('/save-file', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({content: content})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateStatus('Saved: ' + data.filename);
-                    document.getElementById('file-info').textContent = 'File: ' + data.filename;
-                    // Update preview after save
-                    updatePreview();
-                } else {
-                    updateStatus('Save failed: ' + data.error);
-                }
-            })
-            .catch(error => {
-                updateStatus('Save failed: ' + error);
-            });
-        }
-        
-        function clearEditor() {
-            if (confirm('Clear all text?')) {
-                document.getElementById('html-editor').value = '';
-                updatePreview();
-                updateStatus('Cleared');
-            }
-        }
-        
-        function loadLocalFile(file) {
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('html-editor').value = e.target.result;
-                updatePreview();
-                updateStatus('Loaded local file: ' + file.name);
-                document.getElementById('file-info').textContent = 'Local: ' + file.name;
-            };
-            reader.readAsText(file);
-        }
-        
-        function updateStatus(message) {
-            document.getElementById('status').textContent = message;
-        }
+        // Simple script for the default template
+        console.log('Default HTML template loaded');
     </script>
 </body>
 </html>"""
+    
+    def serve_file(self, path, content_type=None):
+        """Serve a file from the filesystem"""
+        # Map paths to actual file locations
+        if path == '/':
+            file_path = os.path.join(self.ui_dir, 'edit_html_ui.html')
+        elif path.startswith('/ui/'):
+            file_path = os.path.join(self.ui_dir, path[4:])
+        else:
+            return None
+        
+        if not os.path.exists(file_path):
+            return None
+        
+        try:
+            with open(file_path, 'rb') as f:
+                content = f.read()
+            
+            if not content_type:
+                content_type, _ = mimetypes.guess_type(file_path)
+                if not content_type:
+                    content_type = 'application/octet-stream'
+            
+            return content, content_type
+        except Exception as e:
+            print(f"Error serving file {file_path}: {e}")
+            return None
     
     def start_editor_server(self):
         """Start editor HTTP server"""
@@ -433,16 +214,19 @@ class SimpleHTMLEditor:
             def do_GET(self):
                 editor_instance = self.server.editor_instance
                 
-                if self.path == '/':
-                    # Serve editor page
+                # Try to serve static file
+                file_data = editor_instance.serve_file(self.path)
+                if file_data:
+                    content, content_type = file_data
                     self.send_response(200)
-                    self.send_header('Content-type', 'text/html')
+                    self.send_header('Content-type', content_type)
+                    self.send_header('Content-Length', str(len(content)))
                     self.end_headers()
-                    
-                    editor_html = editor_instance.get_default_html()
-                    self.wfile.write(editor_html.encode('utf-8'))
-                    
-                elif self.path == '/get-content':
+                    self.wfile.write(content)
+                    return
+                
+                # API endpoints
+                if self.path == '/get-content':
                     # Return current content as JSON
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
@@ -452,12 +236,14 @@ class SimpleHTMLEditor:
                     response = {
                         'content': editor_instance.content,
                         'filename': os.path.basename(editor_instance.html_file) if editor_instance.html_file else None,
-                        'preview_port': editor_instance.preview_port
+                        'preview_port': editor_instance.preview_port,
+                        'has_custom_default': os.path.exists(os.path.join(editor_instance.ui_dir, 'default_html_edited_file.html'))
                     }
                     self.wfile.write(json.dumps(response).encode('utf-8'))
-                    
-                else:
-                    self.send_error(404, "Not found")
+                    return
+                
+                # Not found
+                self.send_error(404, f"Not found: {self.path}")
             
             def do_POST(self):
                 editor_instance = self.server.editor_instance
@@ -496,7 +282,6 @@ class SimpleHTMLEditor:
                             with open(editor_instance.html_file, 'w', encoding='utf-8') as f:
                                 f.write(content_to_save)
                             
-                            # Update base directory to the saved file's directory
                             editor_instance.base_dir = os.path.dirname(os.path.abspath(editor_instance.html_file))
                             
                             response = {
@@ -541,17 +326,16 @@ class SimpleHTMLEditor:
         editor_thread.start()
     
     def start_preview_server(self):
-        """Start preview HTTP server - serves static files from current directory"""
+        """Start preview HTTP server"""
         class PreviewHandler(http.server.BaseHTTPRequestHandler):
             def do_GET(self):
                 editor_instance = self.server.editor_instance
                 
-                # Remove query parameters from path
+                # Remove query parameters
                 clean_path = self.path.split('?')[0]
                 
-                # Root path serves the HTML content directly
                 if clean_path == '/':
-                    # Serve the preview HTML content directly
+                    # Serve the preview HTML content
                     self.send_response(200)
                     self.send_header('Content-type', 'text/html')
                     self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
@@ -562,15 +346,10 @@ class SimpleHTMLEditor:
                     self.wfile.write(editor_instance.preview_content.encode('utf-8'))
                     return
                 
-                # Handle static file requests (CSS, JS, images, etc.)
-                # Default to index.html for empty path
-                if clean_path == '':
-                    clean_path = '/index.html'
-                
-                # Try to serve file from base directory
+                # Handle static files from base directory
                 file_path = os.path.join(editor_instance.base_dir, clean_path.lstrip('/'))
                 
-                # Security check: ensure the file is within the base directory
+                # Security check
                 try:
                     file_path = os.path.normpath(file_path)
                     if not file_path.startswith(os.path.abspath(editor_instance.base_dir)):
@@ -580,15 +359,12 @@ class SimpleHTMLEditor:
                     self.send_error(403, "Forbidden")
                     return
                 
-                # Check if file exists and is a file (not a directory)
                 if os.path.exists(file_path) and os.path.isfile(file_path):
                     try:
-                        # Determine MIME type
                         mime_type, _ = mimetypes.guess_type(file_path)
                         if not mime_type:
                             mime_type = 'application/octet-stream'
                         
-                        # Read and serve the file
                         with open(file_path, 'rb') as f:
                             content = f.read()
                         
@@ -596,19 +372,16 @@ class SimpleHTMLEditor:
                         self.send_header('Content-type', mime_type)
                         self.send_header('Content-Length', str(len(content)))
                         self.end_headers()
-                        
                         self.wfile.write(content)
                         return
                     except Exception as e:
                         self.send_error(500, f"Server error: {str(e)}")
                         return
                 else:
-                    # File not found
                     self.send_error(404, f"File not found: {clean_path}")
                     return
             
             def log_message(self, format, *args):
-                # Suppress HTTP logs
                 pass
         
         # Try different ports for preview
@@ -632,8 +405,16 @@ class SimpleHTMLEditor:
     
     def start_servers(self):
         """Start both servers"""
-        print("Starting HTML Editor...")
+        print("Starting HTML Editor with modular UI...")
+        print(f"UI directory: {self.ui_dir}")
         print(f"Base directory for static files: {self.base_dir}")
+        
+        # Check for custom default HTML
+        default_html_file = os.path.join(self.ui_dir, 'default_html_edited_file.html')
+        if os.path.exists(default_html_file):
+            print("✓ Using custom default HTML from: default_html_edited_file.html")
+        else:
+            print("ℹ Using built-in default HTML (create default_html_edited_file.html for custom)")
         
         # Start both servers
         self.start_editor_server()
@@ -643,8 +424,8 @@ class SimpleHTMLEditor:
             print("Failed to start servers")
             return
         
-        print(f"Editor server started at http://localhost:{self.editor_port}")
-        print(f"Preview server started at http://localhost:{self.preview_port}")
+        print(f"✓ Editor server started at http://localhost:{self.editor_port}")
+        print(f"✓ Preview server started at http://localhost:{self.preview_port}")
         print("Opening browser...")
         print("Press Ctrl+C to stop")
         
@@ -672,7 +453,7 @@ def main():
     if len(sys.argv) > 1:
         html_file = sys.argv[1]
         if not os.path.exists(html_file):
-            print(f"File '{html_file}' not found. Starting with empty editor.")
+            print(f"File '{html_file}' not found. Starting with default HTML.")
             html_file = None
     
     # Create and run editor

@@ -10,13 +10,98 @@ A simple web-based HTML editor with live preview and tag formatting tools. This 
 
 ## Features
 
+### 📋 **Core Interface Features**
 - **Split-pane interface**: Left panel for HTML editing, right panel for live preview
-- **Tag formatting buttons**: Quickly wrap selected text with HTML tags (B, I, U, P, DIV, SPAN)
-- **Live preview**: See HTML rendering as you type
-- **Static file serving**: Preview loads CSS, JavaScript, and images from the current directory
-- **File operations**: Open, Save, and Clear editor
-- **Resizable panels**: Drag the splitter to adjust editor/preview sizes
-- **Auto-load**: Open HTML files from command line
+- **Resizable panels**: Drag the vertical splitter (`‖`) to adjust editor/preview widths (default 50/50 split)
+- **Status bar**: Shows current file and operation status
+- **Clean, professional UI**: No emojis or distracting icons - text-only interface
+
+### 🏷️ **HTML Tags & Structure Menu**
+The editor provides organized menu categories for inserting HTML tags:
+
+#### **Current Implementation**
+**Basic Formatting Tags:**
+- **Bold (B)**: `<b>text</b>` - Bold text
+- **Italic (I)**: `<i>text</i>` - Italic text  
+- **Underline (U)**: `<u>text</u>` - Underlined text
+- **Paragraph (P)**: `<p>text</p>` - Paragraph block
+- **Div**: `<div>text</div>` - Division/container
+- **Span**: `<span>text</span>` - Inline container
+
+#### **Planned/Upcoming Features**
+
+**🔍 Find/Replace Menu**
+- **Find**: Search for substring using modal dialog
+- **Replace**: Replace substring using modal dialog
+
+**↩️ Actions Menu**
+- **Undo**: Revert last change
+- **Redo**: Reapply undone change  
+- **Screen Keyboard**: Show on-screen keyboard
+- **Insert Date**: Insert current date/time
+
+**🏗️ Structure Tags Menu**
+- **Main**: `<main>content</main>` - Main content
+- **Section**: `<section>content</section>` - Thematic grouping
+- **Article**: `<article>content</article>` - Independent content
+- **Aside**: `<aside>content</aside>` - Side content
+- **Header**: `<header>content</header>` - Introductory content
+- **Footer**: `<footer>content</footer>` - Closing content
+- **Nav**: `<nav>links</nav>` - Navigation links
+- **Address**: `<address>contact</address>` - Contact information
+
+**📖 Definitions Submenu**
+- **DL**: `<dl>definition list</dl>` - Definition list
+- **DT**: `<dt>term</dt>` - Definition term
+- **DD**: `<dd>definition</dd>` - Definition description
+
+**📝 Forms Menu**
+- **Form**: `<form>elements</form>` - Input form
+- **Input Text**: `<input type="text">` - Text field
+- **Input Password**: `<input type="password">` - Password field
+- **Checkbox**: `<input type="checkbox">` - Checkbox
+- **Radio**: `<input type="radio">` - Radio button
+- **Hidden Input**: `<input type="hidden">` - Hidden field
+- **Select**: `<select>options</select>` - Dropdown list
+- **Option**: `<option>value</option>` - Dropdown option
+- **Textarea**: `<textarea>content</textarea>` - Multi-line text
+- **Output**: `<output>result</output>` - Calculation result
+
+**🎬 Media Content Menu**
+- **Video**: `<video>sources</video>` - Video player
+- **Video Source**: `<source src="video.mp4">` - Video source
+- **Audio**: `<audio>sources</audio>` - Audio player  
+- **Audio Source**: `<source src="audio.mp3">` - Audio source
+
+**📄 Meta Tags Menu**
+- **Meta Description**: `<meta name="description" content="...">`
+- **Meta Author**: `<meta name="author" content="...">`
+
+### 🛠️ **Editor Features**
+- **Syntax-aware editing**: Monospace font with proper text wrapping
+- **Live preview**: See HTML rendering in real-time as you type
+- **Auto-save on change**: Content is saved to server automatically during editing
+- **Undo/Redo**: Standard browser undo/redo functionality works
+
+### 📁 **File Operations**
+| Button | Function | Description |
+|--------|----------|-------------|
+| **Save** | Save File | Save current HTML to disk. Creates new file if none exists |
+| **Open** | Open File | Open HTML file from local computer via file dialog |
+| **Clear** | Clear Editor | Remove all content from editor (with confirmation) |
+
+### 🌐 **Preview Features**
+- **Live rendering**: Actual HTML/CSS/JavaScript execution in embedded browser
+- **Static asset support**: Images, CSS, JS files load from current directory
+- **Automatic refresh**: Preview updates on every keystroke
+- **Full browser context**: Preview behaves like actual web page
+
+### ⚙️ **Technical Features**
+- **No dependencies**: Pure Python standard library only
+- **Cross-platform**: Works on Windows, macOS, Linux
+- **Auto-port selection**: Automatically finds available port (8080-8099)
+- **Command-line support**: Open files directly from terminal
+- **Browser auto-launch**: Opens editor in default web browser automatically
 
 ## Installation
 
@@ -24,13 +109,13 @@ No installation required! This is a pure Python script with no external dependen
 
 ### Requirements
 - Python 3.6 or higher
-- Modern web browser
+- Modern web browser (Chrome, Firefox, Edge, Safari)
 
 ## Usage
 
 ### Basic usage
 ```bash
-# Run the editor
+# Run the editor (opens in browser)
 python3 edit_html_file.py
 
 # Open an HTML file for editing
@@ -40,21 +125,33 @@ python3 edit_html_file.py index.html
 python3 edit_html_file.py path/to/template.html
 ```
 
-### Using the Editor
-1. **Left panel**: Edit your HTML code
-2. **Right panel**: See live preview of the rendered HTML
-3. **Toolbar buttons**:
-   - **Save**: Save current HTML to file
-   - **Open**: Open an HTML file from your computer
-   - **Clear**: Clear the editor
-   - **B/I/U/P/DIV/SPAN**: Wrap selected text with HTML tags
+### Using the Editor Interface
 
-4. **Splitter**: Drag the `‖` symbol between panels to resize
+1. **Panels Layout**:
+   - **Left Panel (HTML Source)**: Edit your HTML code here
+   - **Right Panel (Live Preview)**: See rendered HTML output
+   - **Splitter (`‖`)**: Drag horizontally to resize panels
 
-### Keyboard Shortcuts
-- **Select text** → Click tag button to wrap with HTML tags
-- **No selection** → Click tag button to insert `<tag>text</tag>` at cursor
-- The preview updates automatically as you type
+2. **Toolbar Operations**:
+   - **File Operations**: Save, Open, Clear
+   - **Tag Formatting**: B, I, U, P, DIV, SPAN buttons
+   - All changes are reflected immediately in the preview panel
+
+3. **Workflow**:
+   - Type HTML in left panel → See results in right panel
+   - Select text → Click tag button → Text gets wrapped
+   - Save frequently with Save button or automatically
+
+### Tag Insertion Methods
+1. **With selection**: Select text → Click tag → Text gets wrapped
+2. **Without selection**: Click tag → `<tag>text</tag>` inserted at cursor
+3. **Nested tags**: Wrap already-tagged content with additional tags
+
+### Keyboard & Mouse Controls
+- **Text selection**: Standard click/drag or Shift+arrow keys
+- **Tag insertion**: Click buttons with or without text selected
+- **Panel resizing**: Click and drag the splitter between panels
+- **File operations**: Use toolbar buttons or browser's file dialog
 
 ## Integration with entity_xml_crud_app
 
@@ -70,44 +167,123 @@ python3 ~/edit_html_file/edit_html_file.py templates/customer_form.html
 python3 ~/edit_html_file/edit_html_file.py templates/product_list.html
 ```
 
-The preview will automatically load CSS, JavaScript, and images from the template's directory, making it ideal for template development.
+### Asset Loading
+The preview automatically serves static files (CSS, JS, images) from the HTML file's directory, making it perfect for:
+- Template development with linked stylesheets
+- Testing image paths and relative URLs
+- Debugging JavaScript functionality
+- Previewing responsive designs
 
 ## How It Works
 
-The editor runs two local HTTP servers:
-1. **Editor server** (port 8080): Serves the editor interface
-2. **Preview server** (port 8081): Serves HTML content and static files
+### Architecture
+```
+Terminal Command → Python Script → Local HTTP Server → Browser Editor
+      ↓                    ↓               ↓               ↓
+  File path        Content loading    Port 8080      User Interface
+      ↓                    ↓               ↓               ↓
+HTML file ←─── File System ←── Auto-save ←── User edits
+```
 
-When you edit HTML, the content is sent to the preview server, and the iframe reloads to show the updated page.
+### Server Details
+The editor runs a local HTTP server that:
+1. Serves the editor interface at `http://localhost:8080`
+2. Handles file operations (open/save)
+3. Manages content updates between editor and preview
+4. Supports static file serving for preview assets
+
+## Roadmap & Planned Features
+
+### Phase 1: Core Editor (Current)
+- ✓ Split-pane interface with resizable panels
+- ✓ Basic tag formatting (B, I, U, P, DIV, SPAN)
+- ✓ File operations (Open, Save, Clear)
+- ✓ Live preview with static asset support
+
+### Phase 2: Enhanced Features (Planned)
+- 🔄 Find/Replace functionality
+- 🔄 Undo/Redo operations
+- 🔄 Structured tag menus (Forms, Media, Meta tags)
+- 🔄 Screen keyboard and date insertion
+
+### Phase 3: Advanced Features (Future)
+- 🔲 Syntax highlighting
+- 🔲 Code validation
+- 🔲 Multiple file tabs
+- 🔲 Export to PDF/Word
+- 🔲 Template library
 
 ## Troubleshooting
 
-### Port already in use
-The script automatically tries ports 8080-8099. If you have conflicts, close other applications using these ports.
+### Common Issues & Solutions
 
-### Images/CSS not loading in preview
-Make sure asset files (images, CSS, JS) are in the same directory as your HTML file or use correct relative paths.
+| Issue | Solution |
+|-------|----------|
+| **Port already in use** | Script auto-tries ports 8080-8099. Close conflicting apps or wait |
+| **Images/CSS not loading** | Ensure asset files are in same directory or use correct relative paths |
+| **Browser doesn't open** | Manually navigate to `http://localhost:8080` (or shown port) |
+| **File save fails** | Check write permissions in target directory |
+| **Preview not updating** | Ensure auto-refresh is working; try manual edit to trigger update |
+| **Tag buttons not working** | Make sure text is selected or cursor is placed in editor |
 
-### Browser doesn't open automatically
-Open your browser and navigate to: `http://localhost:8080`
+### Port Conflicts
+If you see "Address already in use", the script will automatically try the next port. Check terminal output for the actual port number.
+
+### Static File Issues
+For proper asset loading in preview:
+- Keep images in same directory as HTML file
+- Use relative paths: `<img src="image.jpg">`
+- External URLs work normally: `<img src="https://...">`
 
 ## Stopping the Editor
-Press **Ctrl+C** in the terminal to stop the editor.
+- **Normal shutdown**: Press **Ctrl+C** in the terminal
+- **Force quit**: Close terminal or kill Python process
+- **Browser**: Simply close the browser tab/window
 
 ## Project Structure
 ```
 edit_html_file/
-├── edit_html_file.py    # Main editor script
-├── README.md           # This file
-└── (no dependencies required)
+├── edit_html_file.py    # Main editor script (single file!)
+├── README.md           # This documentation
+└── (no dependencies, no installation needed)
 ```
 
+## Development Notes
+
+### Single File Design
+The entire editor is contained in one Python file for maximum portability:
+- No package management required
+- Easy to distribute and share
+- Simple to understand and modify
+
+### Extensibility
+The modular design allows for easy addition of:
+- New tag buttons and menu categories
+- Additional file formats
+- Custom themes/styles
+- Enhanced preview features
+
 ## License
-Open source - use as you wish!
+Open source - free to use, modify, and distribute.
 
 ## Related Projects
-- [ArtNazarov/entity_xml_crud_app](https://github.com/ArtNazarov/entity_xml_crud_app) - Use this editor for HTML template development
+- [ArtNazarov/entity_xml_crud_app](https://github.com/ArtNazarov/entity_xml_crud_app) - Ideal companion for HTML template development
+- Perfect for web development students, template designers, and quick HTML prototyping
+
+## Version History
+- **v1.0**: Initial release with split-pane editor, basic tag buttons, live preview
+- **v1.1**: Added static file serving, improved UI, bug fixes
+- **v1.2**: Planned - Find/Replace, Undo/Redo, expanded tag menus
 
 ---
 
-Perfect for quick HTML edits, template development, or learning HTML with immediate visual feedback!
+## Quick Start Checklist
+- [ ] Python 3.6+ installed
+- [ ] Download `edit_html_file.py`
+- [ ] Run: `python3 edit_html_file.py`
+- [ ] Edit HTML in left panel
+- [ ] See live preview in right panel
+- [ ] Use tag buttons for quick formatting
+- [ ] Save your work frequently
+
+**Perfect for**: Quick HTML edits, template development, learning HTML, prototyping, or testing web snippets with immediate visual feedback! 

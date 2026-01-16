@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML Editor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/ui/edit_html_ui.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Main menu will be injected here by mainmenu.js -->
+        <div id="main-menu-container"></div>
+        
+        <div class="container">
+            <div class="header">
+                <h1>HTML Editor</h1>
+                <div class="toolbar" id="main-toolbar">
+                    <button class="file-btn" onclick="handleSave()">Save</button>
+                    <button class="file-btn" onclick="handleOpen()">Open</button>
+                    <button class="clear-btn" onclick="handleClear()">Clear</button>
+                    
+                    <input type="file" id="file-input" class="file-input" accept=".html,.htm">
+                    
+                    <div style="flex-grow: 1;"></div>
+                    
+                    <button class="tag-btn" onclick="wrapSelection('b')">Bold (B)</button>
+                    <button class="tag-btn" onclick="wrapSelection('i')">Italic (I)</button>
+                    <button class="tag-btn" onclick="wrapSelection('u')">Underline (U)</button>
+                    <button class="tag-btn" onclick="wrapSelection('p')">Paragraph (P)</button>
+                    <button class="tag-btn" onclick="wrapSelection('div')">Div</button>
+                    <button class="tag-btn" onclick="wrapSelection('span')">Span</button>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="split-panel">
+                    <div class="panel-label">HTML Source</div>
+                    <div class="editor-container">
+                        <textarea id="html-editor" spellcheck="false"></textarea>
+                    </div>
+                </div>
+                
+                <div class="splitter" id="splitter">‖</div>
+                
+                <div class="split-panel">
+                    <div class="panel-label">Live Preview</div>
+                    <div class="preview-container">
+                        <iframe id="preview-frame"></iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-bar">
+                <div id="file-info">No file loaded</div>
+                <div>Status: <span id="status">Ready</span></div>
+            </div>
+        </div>
+        
+        <!-- Modal dialogs -->
+        <div id="modal-overlay" class="modal-overlay"></div>
+        <div id="find-replace-modal" class="modal">
+            <div class="modal-header">
+                <h3>Find and Replace</h3>
+                <span class="close-modal" onclick="closeModal('find-replace-modal')">×</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="find-text">Find:</label>
+                    <input type="text" id="find-text" placeholder="Text to find">
+                </div>
+                <div class="form-group">
+                    <label for="replace-text">Replace with:</label>
+                    <input type="text" id="replace-text" placeholder="Replacement text">
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="case-sensitive"> Case sensitive</label>
+                    <label><input type="checkbox" id="whole-word"> Whole word only</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="handleFind()">Find</button>
+                <button onclick="handleReplace()">Replace</button>
+                <button onclick="handleReplaceAll()">Replace All</button>
+                <button onclick="closeModal('find-replace-modal')">Cancel</button>
+            </div>
+        </div>
+        
+        <div id="keyboard-modal" class="modal">
+            <div class="modal-header">
+                <h3>On-screen Keyboard</h3>
+                <span class="close-modal" onclick="closeModal('keyboard-modal')">×</span>
+            </div>
+            <div class="modal-body">
+                <div id="keyboard-container"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/ui/edit_html_ui.js"></script>
+    <script src="/ui/mainmenu.js"></script>
+    <script src="/ui/actionhandlers.js"></script>
+    <script>
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initUI();
+            makeMainMenu();
+        });
+    </script>
+</body>
+</html>
