@@ -2,6 +2,12 @@
 
 A simple web-based HTML editor with live preview and tag formatting tools. This editor is designed for quick HTML editing with real-time preview in a split-pane interface.
 
+## Screenshots
+
+![Open index.html and edit it in the left panel](https://dl.dropbox.com/scl/fi/uq13t4ugxe33ukmmtr14g/edit_I.png?rlkey=mhujupvndz8vt748vt7ai05vr&st=cvhd2uiq)
+
+![View changed file at right panel](https://dl.dropbox.com/scl/fi/b7r5v0cyj7sy3pfgrxrkz/edit_II.png?rlkey=iiecz5s0a7zn7yo87m0grv2dg&st=dp8l53ys)
+
 ## Features
 
 - **Split-pane interface**: Left panel for HTML editing, right panel for live preview
