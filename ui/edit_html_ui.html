@@ -33,9 +33,10 @@
             </div>
             
             <div class="main-content">
-                <div class="split-panel">
+                <div class="split-panel highlight-container">
                     <div class="panel-label">HTML Source</div>
                     <div class="editor-container">
+                        <pre id="highlighter" aria-hidden="true"></pre>
                         <textarea id="html-editor" spellcheck="false"></textarea>
                     </div>
                 </div>
@@ -99,11 +100,20 @@
     <script src="/ui/edit_html_ui.js"></script>
     <script src="/ui/mainmenu.js"></script>
     <script src="/ui/actionhandlers.js"></script>
+    <script src="/ui/apply_highlight.js"></script>
     <script>
         // Initialize on DOM ready
         document.addEventListener('DOMContentLoaded', function() {
             initUI();
             makeMainMenu();
+
+            const editor = document.getElementById('html-editor');
+            const highlighter = document.getElementById('highlighter');
+            ApplyHighlight(editor, highlighter);
+            
+
+           
+
         });
     </script>
 </body>

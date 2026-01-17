@@ -513,4 +513,4 @@ window.closeModal = closeModal;
 window.createKeyboard = createKeyboard;
 window.insertAtCursor = insertAtCursor;
 window.wrapSelectionWithTag = wrapSelectionWithTag;
-window.loadLocalFile = loadLocalFile;
+//window.loadLocalFile = loadLocalFile;

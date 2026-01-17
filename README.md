@@ -10,6 +10,8 @@ A simple web-based HTML editor with live preview and tag formatting tools. This 
 
 ![Main menu](https://dl.dropbox.com/scl/fi/svsr5qr5eji5xvyldgrv6/edit_III.png?rlkey=sogxkz7cbntc99cri4whsjk3i&st=njpsir75)
 
+![Simple highlighting](https://dl.dropbox.com/scl/fi/mwwc2kphu2s6xmqacpzle/edit_IV.png?rlkey=82q037uif41ilz31ah0mm3ctd&st=zjjdnju3)
+
 ## Features
 
 ### 📋 **Core Interface Features**

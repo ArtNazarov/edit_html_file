@@ -410,3 +410,57 @@ button {
     background-color: orange;
     border: 1px solid red;
 }
+
+.highlight-container {
+  position: relative;
+  font-family: monospace;
+  line-height: 1.4;
+}
+
+#highlighter {
+  position: absolute;
+  top: 0px;
+  left: 0;
+  padding: 8px;
+  margin: 0;
+  background: #f9f9f9;
+
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  pointer-events: none;
+ overflow-x: hidden;
+  overflow-wrap:normal;
+  overflow-y: hidden;
+  width:98%;
+  background: transparent;
+z-index:3;
+resize: none;
+
+}
+
+
+#html-editor {
+    color:transparent;
+    width:98%;
+  top: 0px;
+  left:0;
+  margin:0;
+  z-index:1;
+   white-space: nowrap;
+  position: absolute;
+  width: 100%;
+  min-height: 200px;
+     overflow-y: hidden;
+  padding: 8px;
+  border: 0px solid #ccc;
+   caret-color: red; 
+ 
+   
+  font: inherit;
+  tab-size: 4;
+  outline: none;
+
+   resize: none;  
+  overflow: hidden;
+ 
+}

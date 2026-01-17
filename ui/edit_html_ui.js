@@ -13,7 +13,13 @@ function initUI() {
         .then(data => {
             const editor = document.getElementById('html-editor');
             editor.value = data.content;
-            
+            highlighter = document.getElementById('highlighter');
+
+
+            const text = editor.value;
+            highlighter.innerHTML = highlight(text) || '\n'; // prevent collapse
+            highlighter.style.height = editor.scrollHeight + 'px';
+
             if (data.filename) {
                 document.getElementById('file-info').textContent = 'File: ' + data.filename;
             } else {
